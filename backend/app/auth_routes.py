@@ -1,8 +1,58 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, redirect, url_for
+from flask_dance.contrib.google import make_google_blueprint, google
 from .models import db, User
 from .utils import hash_password, create_token, password_check
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
+
+def init_oauth(app):
+    google_bp = make_google_blueprint(
+        client_id=app.config['GOOGLE_CLIENT_ID'],
+        client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+        scope=["profile", "email"],
+        redirect_url='http://localhost:5000/auth/google/authorized',
+        redirect_to='auth_bp.google_login'
+    )
+    # OAuth blueprints
+    app.register_blueprint(google_bp, url_prefix='/auth/google')
+
+# Google login
+@auth_bp.route('/google-login')
+def google_login():
+    if not google.authorized:
+        return redirect(url_for('google.login'))
+    
+    # acquire user information
+    resp = google.get("/oauth2/v2/userinfo")
+    if not resp.ok:
+        return jsonify({'error': 'Failed to fetch user info'}), 400
+    
+    user_info = resp.json()
+
+    # get the email and name 
+    email = user_info.get('email')
+    name = user_info.get('name')
+
+    if not email:
+        return jsonify({'error': 'Email not available from Google.'}), 400
+
+    # if no user create new user
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        user = User(name=name, email=email, phone=None, password_hash=None, role='user')
+        db.session.add(user)
+        db.session.commit()
+
+    # token
+    token = create_token(user.id, user.role)
+
+    return jsonify({
+        'message': 'Google login successful!',
+        'token': token,
+        'email': user.email,
+        'name': user.name
+    }), 200
+
 
 # Register
 @auth_bp.route('/register', methods=['POST'])
@@ -76,3 +126,11 @@ def login():
         'message': 'Login successful',
         'token': token
     }), 200
+
+
+
+
+ 
+
+
+        

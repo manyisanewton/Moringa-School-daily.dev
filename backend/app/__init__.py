@@ -19,12 +19,14 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
 
     # initialize CORS
-    CORS(app, origins=["http://localhost:3000"])
-
-    from app import models
+    CORS(app)
+    app.secret_key = app.config['SECRET_KEY']
+    app.config['SESSION_COOKIE'] = '5RDCVGT7UJMKOL'
 
     # register blueprints
-    from .auth_routes import auth_bp
+    from .auth_routes import auth_bp, init_oauth
+    
+    init_oauth(app)
     app.register_blueprint(auth_bp)
 
     return app
