@@ -1,6 +1,5 @@
 import logging
 from flask import Blueprint, jsonify, request
-
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request, decode_token
 from sqlalchemy.exc import SQLAlchemyError
 from flask_socketio import emit, disconnect
@@ -52,7 +51,7 @@ def handle_connect(data):
         logger.error("Invalid token in SocketIO connection: %s", str(e))
         disconnect()
 
-
+# REST endpoint to list notifications
 @notifications_bp.route("", methods=["GET"])
 @jwt_required()
 def list_notifications():
@@ -68,10 +67,11 @@ def list_notifications():
     items = [
         {
             "id": notif.id,
-            "content_id": notif.content_id,
+            "type": "System",
             "message": notif.message,
-            "is_read": notif.is_read,
-            "created_at": notif.created_at.isoformat(),
+            "subMessage": notif.message,
+            "time": notif.created_at.isoformat(),
+            "read": notif.is_read
         }
         for notif in pagination.items
     ]
@@ -81,6 +81,8 @@ def list_notifications():
         "per_page": pagination.per_page,
         "total": pagination.total,
     }), 200
+
+# REST endpoint to mark notification as read
 @notifications_bp.route("/<int:note_id>/read", methods=["POST"])
 @jwt_required()
 def mark_read(note_id):
@@ -95,17 +97,32 @@ def mark_read(note_id):
     notification.is_read = True
     try:
         db.session.commit()
+        logger.info("User %s marked notification %s as read", user_id, note_id)
+        return jsonify({"message": "Marked as read"}), 200
     except SQLAlchemyError:
         db.session.rollback()
-        logger.exception(
-            "Failed to mark notification %s read for user %s",
-            note_id,
-            user_id,
-        )
+        logger.exception("Failed to mark notification %s read for user %s", note_id, user_id)
         return jsonify({"error": "Could not mark as read"}), 500
-    logger.info(
-        "User %s marked notification %s as read",
-        user_id,
-        note_id,
-    )
-    return jsonify({"message": "Marked as read"}), 200
+
+# Add notification triggers (already present, ensuring consistency)
+def notify_new_post(post):
+    category_id = post.category_id
+    from .models import Subscription
+    subscribers = Subscription.query.filter_by(category_id=category_id).all()
+    for sub in subscribers:
+        message = f'New {post.type} posted in category ID {category_id}: "{post.title}"'
+        create_and_emit_notification(sub.user_id, message, post.id)
+
+def notify_new_comment(comment):
+    post = comment.post
+    message = f'New comment on post "{post.title}": "{comment.body}"'
+    post_author_id = post.category.created_by
+    if post_author_id and post_author_id != comment.user_id:
+        create_and_emit_notification(post_author_id, message, post.id)
+
+def notify_new_like(like):
+    post = Post.query.get(like.post_id)
+    message = f'Your post "{post.title}" received a new like!'
+    post_author_id = post.category.created_by
+    if post_author_id and post_author_id != like.user_id:
+        create_and_emit_notification(post_author_id, message, post.id)
