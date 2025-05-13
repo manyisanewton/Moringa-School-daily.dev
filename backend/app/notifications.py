@@ -52,8 +52,7 @@ def handle_connect(data):
         logger.error("Invalid token in SocketIO connection: %s", str(e))
         disconnect()
 
-# REST endpoint to list notifications
->>>>>>> ba42bbb8 (Add audit.py, notifications.py, and email_verification.py from sandra branch)
+
 @notifications_bp.route("", methods=["GET"])
 @jwt_required()
 def list_notifications():
