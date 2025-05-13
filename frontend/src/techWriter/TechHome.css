@@ -1,0 +1,115 @@
+  .techwriter-content {
+    flex: 1;
+    padding: 2rem;
+  }
+  
+  .techwriter-content h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .techwriter-content p {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  
+  .stats-section {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    margin-left: 80px;
+    margin-right: 80px;
+  }
+  
+  .stat-card {
+    background-color: #FFF;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+    flex: 1;
+    text-align: center;
+  }
+
+  .stat-card:hover {
+    transform: scale(1.02);
+  }
+  
+  .stat-card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  #orange {
+    color: #F8510B;
+  }
+  
+  .stat-card p {
+    font-size: 2rem;
+    color: #F8510B;
+  }
+
+  .span-value {
+    color: #F8510B;
+    margin-right: 10px;
+    font-size: 1.7rem;
+  }
+
+  .span-label {
+    color: #11203A;
+    font-size: 1.7rem;
+  }
+  
+  .stats-loading {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .spinner {
+    border: 4px solid #F0F0F0;
+    border-top: 4px solid #F8510B;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .actions-section {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .actions-section button {
+    background-color: #F8510B;
+    color: #FFF;
+    border: none;
+    padding: 0.85rem 1.7rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    font-size: large;
+  }
+  
+  .actions-section button:hover {
+    transform: scale(1.05);
+  }
+  
+  @media (max-width: 768px) {
+    .stats-section {
+      flex-direction: column;
+    }
+  
+    .actions-section {
+      flex-direction: column;
+    }
+  
+    .actions-section button {
+      width: 100%;
+    }
+  }
