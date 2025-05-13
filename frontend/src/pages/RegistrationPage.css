@@ -1,0 +1,178 @@
+.register-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+@media (min-width: 768px) {
+    .register-container {
+        flex-direction: row;
+    }    
+}
+
+/* Left panel */
+.left-panel {
+    flex: 1;
+    background-color: #11203A;
+    color: #ffffff;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.left-panel h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    line-height: 1.4;
+    margin: 0 auto;
+}
+
+.left-panel p {
+    font-size: 1rem;
+    margin: 0 auto 20px;
+}
+
+/* responsiveness */
+@media (min-width: 768px) {
+    .left-panel h1 {
+        font-size: 3rem;
+        margin-left: 130px;
+        margin-right: 150px;
+    }
+    
+    .left-panel p {
+        font-size: 1.25rem;
+        margin-left: 100px;
+        margin-right: 120px;
+    }
+}
+
+.login-btn {
+    background-color: #F8510B;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    justify-content: center;
+    width: 60%;
+    margin: 0 auto;
+}
+
+.login-btn:hover {
+    background-color: #f8520ba6;
+}
+
+/* right panel */
+.right-panel {
+    flex: 1;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.form-card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.form-card h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #11203A;
+    text-align: center;
+}
+
+.form-card label {
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: regular;
+}
+
+.form-card input, .form-card select {
+    width: 95%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1.5px solid #11203A;
+    border-radius: 6px;
+    background-color: #ffffff;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    cursor: pointer;
+    color: #11203A;
+}
+
+.register-btn {
+    width: 60%;
+    background-color: #F8510B;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 10px;
+    cursor: pointer;
+    display: block;
+    margin: auto;
+}
+
+@media (min-width: 768) {
+    .login-btn {
+        width: 80%;
+        margin: 0 auto;
+    }    
+}
+
+.register-btn:hover {
+    background-color: #f8520ba6;
+}
+
+/* various socials i.e github and google */
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #11203A;
+    font-size: 0.9rem;
+}
+
+.social-login {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.social-btn .icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    justify-content: center;
+    gap: 12px;
+}
+
+.social-btn .icon:hover {
+    transform: scale(1.3);
+}

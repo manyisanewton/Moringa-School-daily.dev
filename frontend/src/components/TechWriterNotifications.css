@@ -1,0 +1,138 @@
+  .techwriter-content {
+    flex: 1;
+    padding: 2rem;
+  }
+  
+  .techwriter-content h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .techwriter-content p {
+    color: #11203A;
+    margin-bottom: 2rem;
+  }
+
+  .notifications-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    background-color: #FFF;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .notifications-table {
+    width: 100%;
+    border-collapse: separate;
+    background-color: #ffffff;
+    font-family: 'Times New Roman', Times, serif;
+    box-sizing: border-box;
+    border-spacing: 0 25px;
+  }
+
+  .notifications-table-head {
+    background-color: #11203A;
+    color: #ffffff;
+    font-size: large;
+  }
+
+  .notifications-table th, .notifications-table td {
+    padding: 1rem;
+    font-size: 1.25rem;
+    text-align: left;
+  }
+
+  .notifications-table th {
+    font-weight: bold;
+  }
+
+  .notifications-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .notifications-table tbody td:last-child {
+    text-align: center;
+  }
+
+  .notifications-table tbody td input[type="checkbox"] {
+    cursor: pointer;
+    vertical-align: middle;;
+  }
+  
+  .table-header, .notification-row {
+    grid-template-columns: 150px 1fr;
+  }
+  
+  .skeleton {
+    background: linear-gradient(90deg, #D0D0D0 25%, #E0E0E0 50%, #D0D0D0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+  }
+  
+  .skeleton-time {
+    width: 80%;
+    height: 15px;
+  }
+  
+  .skeleton-event {
+    width: 90%;
+    height: 15px;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  /* responsive styling */
+  @media (max-width: 768px) {
+    .notifications-content {
+      padding: 15px;
+    }
+
+    .notifications-table th, .notifications-table td {
+      font-size: 1rem;
+      padding: 0.75rem;
+    }
+
+    .techwriter-content {
+      padding: 1rem;
+    }
+
+    .techwriter-content h1 {
+      font-size: 1.5rem;
+    }
+
+    .techwriter-content p {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .table-header, .notification-row {
+      grid-template-columns: 1fr;
+    }
+
+    .notifications-content {
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    .notifications-table th, .notifications-table td {
+      font-size: 0.9rem;
+      padding: 0.5rem;
+    }
+
+    .techwriter-content h1 {
+      font-size: 1.25rem;
+    }
+
+    .techwriter-content p {
+      font-size: 0.8rem;
+    }
+  }

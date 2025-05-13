@@ -1,0 +1,221 @@
+.your-feed {
+    margin-bottom: 2.5rem;
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    margin-left: 80px;
+    margin-right: 120px;
+    margin-top: 15px;
+}
+
+.title {
+    font-size: 2rem;
+    margin-left: 50px;
+    font-weight: 500;
+}
+
+.feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.feed-cards {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5) ;
+    padding-left: 17px;
+    padding-right: 25px;
+    gap: 5;
+}
+
+.cat {
+    display: inline-block;
+    font-size: 1rem;
+    color: white;
+    background-color: #F8510B;
+    padding: 0.5rem 1.5rem;
+    border-radius: 7px;
+}
+
+.feed-title {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #11203a;
+}
+
+.date {
+    font-size: 0.75rem;
+    color: grey;
+}
+
+/* include responsiveness */
+@media (max-width: 1024px) {
+    .your-feed {
+        margin-left: 40px;
+        margin-right: 40px;
+    }    
+
+    .title {
+        margin-left: 20px;
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .your-feed {
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 1rem;
+    }
+
+    .title {
+        margin-left: 10px;
+        font-size: 1.5rem;
+    }
+
+    .feed-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
+
+@media (max-width: 480px) {
+    .your-feed {
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 0.5rem;
+    }    
+
+    .title {
+        margin-left: 5px;
+        font-size: 1.2rem;
+    }
+
+    .cat {
+        font-size: 0.9rem;
+        padding: 0.3rem 1rem;
+    }
+
+    .feed-title {
+        font-size: 0.9rem;
+    }
+
+    .date {
+        font-size: 0.65rem;
+    }
+}
+
+
+/* Existing styles (assuming these are present) */
+.feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .feed-cards {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  
+  .feed-cards:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cat {
+    display: inline-block;
+    background-color: #F8510B;
+    color: white;
+   
+    padding: 0.5rem 1.5rem;
+    border-radius: 7px;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+  
+  .feed-title {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .date {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  /* New styles for Audio section */
+  .audio-card {
+    position: relative;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .audio-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .audio-player {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    padding: 5px;
+  }
+  
+  .audio-player audio {
+    width: 100%;
+    outline: none;
+  }
+  
+  .audio-player audio::-webkit-media-controls-panel {
+    background-color: #fff;
+    border-radius: 4px;
+  }
+  
+  .audio-player audio::-webkit-media-controls-play-button,
+  .audio-player audio::-webkit-media-controls-pause-button {
+    background-color: #F8510B;
+    border-radius: 50%;
+  }
+  
+  .audio-player audio::-webkit-media-controls-current-time-display,
+  .audio-player audio::-webkit-media-controls-time-remaining-display {
+    color: #333;
+    font-size: 0.9rem;
+  }
+  
+  .audio-player audio::-webkit-media-controls-timeline {
+    background-color: #ddd;
+  }
+  
+  .audio-player audio::-webkit-media-controls-timeline-container {
+    background-color: #f1f1f1;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .feed-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .audio-player audio {
+      width: 100%;
+    }
+  }
