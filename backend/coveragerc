@@ -1,0 +1,6 @@
+[run]
+omit =
+    run.py
+    app/email_verification.py
+    app/password_reset.py
+    app/content.py
