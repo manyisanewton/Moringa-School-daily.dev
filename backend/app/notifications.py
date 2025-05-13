@@ -1,11 +1,59 @@
 import logging
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+
+from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request, decode_token
 from sqlalchemy.exc import SQLAlchemyError
-from . import db
-from .models import Notification
+from flask_socketio import emit, disconnect
+from . import db, socketio
+from .models import Notification, Post, Comment, Like
+
 logger = logging.getLogger(__name__)
 notifications_bp = Blueprint("notifications", __name__, url_prefix="/notifications")
+
+# Helper function to create and emit a notification
+def create_and_emit_notification(user_id, message, content_id=None):
+    notification = Notification(
+        user_id=user_id,
+        content_id=content_id,
+        message=message,
+        is_read=False
+    )
+    db.session.add(notification)
+    try:
+        db.session.commit()
+        # Emit the notification to the user via SocketIO
+        socketio.emit('new_notification', {
+            'id': notification.id,
+            'type': 'System',
+            'message': message,
+            'subMessage': message,
+            'time': notification.created_at.isoformat(),
+            'read': notification.is_read
+        }, room=str(user_id))
+    except SQLAlchemyError:
+        db.session.rollback()
+        logger.exception("Failed to create notification for user %s", user_id)
+
+# WebSocket event for clients to connect
+@socketio.on('connect_notification')
+def handle_connect(data):
+    token = data.get('token')
+    if not token:
+        logger.error("No token provided in SocketIO connection")
+        disconnect()
+        return
+
+    try:
+        decoded_token = decode_token(token)
+        user_id = decoded_token['sub']
+        logger.info("User %s connected for notifications", user_id)
+        socketio.server.enter_room(request.sid, str(user_id))
+    except Exception as e:
+        logger.error("Invalid token in SocketIO connection: %s", str(e))
+        disconnect()
+
+# REST endpoint to list notifications
+>>>>>>> ba42bbb8 (Add audit.py, notifications.py, and email_verification.py from sandra branch)
 @notifications_bp.route("", methods=["GET"])
 @jwt_required()
 def list_notifications():
