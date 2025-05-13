@@ -19,7 +19,6 @@ def handle_validation_error(err):
     return jsonify(errors=err.messages), 400
 def _profile_to_dict(u: User):
     profile = u.profile or {}
-    roles = [role.name for role in u.roles]
     return {
         "user_id": u.id,
         "id": u.id,
@@ -30,8 +29,6 @@ def _profile_to_dict(u: User):
         "bio": getattr(profile, "bio", None),
         "avatar_url": getattr(profile, "avatar_url", None),
         "social_links": getattr(profile, "social_links", None),
-        "roles": roles,
-        "primary_role": u.get_primary_role()  # Include primary role
     }
 @user_bp.route("/me/profile", methods=["GET"])
 @jwt_required()
@@ -57,7 +54,11 @@ def update_my_profile():
     if not u.profile:
         u.profile = UserProfile(user_id=uid)
         db.session.add(u.profile)
-    for field in ("name", "bio", "avatar_url", "social_links"):
+    if "name" in data:
+        first_name = data["name"].split()[0]
+        u.profile.name = first_name
+
+    for field in ("bio", "avatar_url", "social_links"):
         if field in data:
             setattr(u.profile, field, data[field])
     try:
@@ -66,6 +67,20 @@ def update_my_profile():
         db.session.rollback()
         logger.exception("Failed updating profile for user_id=%s", uid)
         return jsonify(error="Could not update profile."), 500
+    return jsonify(_profile_to_dict(u)), 200
+@user_bp.route("/<int:user_id>/profile", methods=["GET"])
+@jwt_required()
+@roles_required("Admin")
+@audit("get_user_profile", target_type="UserProfile", target_id_arg="user_id")
+def get_user_profile(user_id):
+    u = User.query.get_or_404(user_id)
+    if not u.profile:
+        u.profile = UserProfile(user_id=user_id)
+        db.session.add(u.profile)
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
     return jsonify(_profile_to_dict(u)), 200
 @user_bp.route("/<int:user_id>/promote/<role_name>", methods=["POST"])
 @jwt_required()
@@ -86,6 +101,5 @@ def promote_user(user_id, role_name):
     roles = [role.name for role in u.roles]
     return jsonify(
         message=f"{u.email} promoted to {role_name}",
-        roles=roles,
-        primary_role=u.get_primary_role()  # Include primary role
+        roles=roles
     ), 200

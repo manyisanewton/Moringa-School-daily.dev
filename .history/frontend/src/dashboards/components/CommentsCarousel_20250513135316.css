@@ -1,0 +1,98 @@
+.carousel {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.carousel-title {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+.carousel-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.arrow {
+    font-size: 1rem;
+    color: #ffffff;
+    background-color: #11203A;
+}
+
+.testimonial {
+    background-color: #11203A;
+    color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    max-width: 48rem;
+    width: 100%;
+}
+
+.avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    margin: 0 auto 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.text {
+    font-size: 1.115rem;
+    margin-bottom: 0.5rem;
+}
+
+.author {
+    font-size: 1rem;
+    color: #F8510B;
+}
+
+/* make the page responsive */
+@media (max-width: 768px) {
+    .carousel-title {
+        font-size: 1.5rem;
+    }    
+
+    .testimonial {
+        padding: 1rem;
+        max-width: 90%;
+    }
+
+    .text {
+        font-size: 1rem;
+    }
+
+    .author {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-title {
+        font-size: 1.25rem;
+    }
+
+    .testimonial {
+        padding: 0.75rem;
+    }
+
+    .avatar {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .text {
+        font-size: 0.9rem;
+    }
+
+    .author {
+        font-size: 0.8rem;
+    }
+}

@@ -26,15 +26,6 @@ class BaseConfig:
     AUDIT_LOG_MAX_LIMIT = int(os.getenv("AUDIT_LOG_MAX_LIMIT", 200))
     RECOMMEND_PER_PAGE = int(os.getenv("RECOMMEND_PER_PAGE", 20))
     MAX_RECOMMEND_PER_PAGE = int(os.getenv("MAX_RECOMMEND_PER_PAGE", 50))
-    # Flask-Mail Configuration (Gmail SMTP)
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 587
-    MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_USERNAME')
-    
-    
 class DevConfig(BaseConfig):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(

@@ -1,0 +1,113 @@
+.content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap; 
+}
+
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+        align-items: flex-start; 
+        padding: 15px; 
+    }
+}
+
+.content-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    font-family: 'Times New Roman', Times, serif;
+    box-sizing: border-box; 
+    overflow-x: auto; 
+}
+
+.table-head {
+    background-color: #11203A;
+    color: #ffffff;
+    text-align: left;
+    font-size: large;
+}
+
+.content-table th,
+.content-table td {
+    padding: 1rem;
+    font-size: 1.10rem;
+    word-wrap: break-word; 
+}
+
+.content-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.content-table .approve-btn,
+.content-table .remove-btn {
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-right: 0.4rem;
+    cursor: pointer;
+}
+
+.approve-btn {
+    background-color: #F8510B;
+    color: #ffffff;
+}
+
+.remove-btn {
+    background-color: #F8510B;
+    color: #ffffff;
+}
+
+.stats {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.stats svg {
+    margin-right: 0.3rem;
+    color: #11203A;
+}
+
+/*  status badges */
+td.pending {
+    color: #FFA500;
+    font-weight: 600;
+}
+
+td.approved {
+    color: #43B430;
+    font-weight: 600;
+}
+
+td.flagged {
+    color: red;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .content-table th,
+    .content-table td {
+        font-size: 0.9rem; 
+        padding: 0.8rem;
+    }
+
+    .content-table .approve-btn,
+    .content-table .remove-btn {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.6rem; 
+    }
+
+    .stats {
+        flex-direction: column; 
+        gap: 0.5rem; 
+    }
+}
+

@@ -1,5 +1,4 @@
 {
-  "$schema": "./local-package-schema.json",
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
@@ -11,19 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
-    "axios": "^1.9.0",
-    "cors": "^2.8.5",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-icons": "^5.5.0",
-    "react-router-dom": "^7.5.3",
-    "react-toastify": "^11.0.5",
-    "socket.io-client": "^4.8.1",
-    "sweetalert2": "^11.21.0",
-    "swiper": "^11.2.6"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
