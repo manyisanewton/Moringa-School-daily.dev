@@ -5,29 +5,29 @@
 # 📌 Table of Contents
 ## .Project Overview
 
-## . MVP Features
+. MVP Features
 
-## .Admin Features
+ .Admin Features
 
-# #.Tech Writer Features
+.Tech Writer Features
 
-## .User Features
+ .User Features
 
-# #.Technical Stack
+.Technical Stack
 
-## .Installation & Setup
+.Installation & Setup
 
-## .API Endpoints
+.API Endpoints
 
-## .Database Schema
+.Database Schema
 
-## .Testing
+.Testing
 
-## .Future Roadmap
+.Future Roadmap
 
-## .Contributing
+.Contributing
 
-## .License
+.License
 
 ## 🌐 Project Overview
 Moringa School daily.dev is a platform designed to create an open and accessible community for Moringa School students, alumni, and instructors to share verified tech content. This includes insightful articles, educational videos, and podcasts that cover various aspects of the tech industry.
