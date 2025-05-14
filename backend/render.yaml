@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: quest-for-the-lost-treasure
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn -w 4 -b 0.0.0.0:$PORT app:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.8.10
+      - key: HF_API_TOKEN
+        sync: false

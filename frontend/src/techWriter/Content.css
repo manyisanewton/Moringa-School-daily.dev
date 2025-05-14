@@ -1,0 +1,23 @@
+.contentContainer {
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 1200px;
+    font-family: 'Times New Roman', Times, serif
+}
+
+.greeting {
+   font-size: 1.5rem;
+   color: #11203A;
+   margin-bottom: 1rem;
+   padding-left: 5rem;
+}
+  
+
+.content-head {
+    color: #11203A;
+}
+
+.content-description {
+    color: #11203A;
+    font-size: large;
+}

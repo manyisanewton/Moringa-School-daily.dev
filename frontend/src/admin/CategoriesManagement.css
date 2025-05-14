@@ -1,0 +1,428 @@
+.admin-categories-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #F5F5F5;
+    color: #333;
+  }
+  
+  .admin-header {
+    background-color: #1A2A4F;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .categories-header {
+    flex: 1;
+    padding-left: 7rem;
+    padding-right: 7rem;
+  }
+
+  .categories-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .categories-header p {
+    color: #11203a;
+    margin-bottom: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .categories-header {
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+
+    .categories-header h1 {
+        font-size: 1.7rem;
+    }
+
+    .categories-header p {
+        font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .categories-header {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }    
+
+    .categories-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .categories-header p {
+        font-size: 0.9rem;
+    }
+  }
+  
+  .search-bar-categories {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    flex-grow: 1;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 30px;
+    padding: 8px 15px;
+    max-width: 500px;
+    border: 1px solid #11203A;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .search-bar-categories input {
+    background-color: transparent;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 450px;
+  }
+
+  .search-bar-categories input:focus {
+    outline: none;
+  }
+  
+  .search-icon {
+    color: #F8510B;
+    font-size: 1.5em;
+    position: sticky;
+    cursor: pointer;
+  }
+
+  @media (max-width: 768px) {
+    .search-bar-categories {
+        max-width: 300px;
+        padding: 8px 12px;
+    }    
+
+    .search-bar-categories input {
+        width: 200px;
+        font-size: 0.9rem;
+    }
+  }
+
+  .add-category-btn {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    padding-right: 7rem;
+  }
+
+  .add-category-btn button {
+    background-color: #F8510B;
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+    .add-category-btn button:hover {
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+        .add-category-btn {
+            padding-right: 3rem;
+        }   
+        
+        .add-category-btn button {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .add-category-btn {
+            padding-right: 1.5rem;
+        }
+
+        .add-category-btn button {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+        
+    }
+  
+  .add-category-form {
+    background-color: #FFF;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    margin-left: 50px;
+    margin-right: 70px;
+  }
+  
+  .add-category-form h3, .add-category-form h4 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .add-category-form label {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #11203A;
+  }
+  
+  .add-category-form input,
+  .add-category-form select,
+  .add-category-form textarea {
+    width: 95%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #11203A;
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: #ffffff;
+    box-sizing: border-box;
+  }
+  
+  .add-category-form textarea {
+    height: 100px;
+    resize: vertical;
+  }
+  
+  .add-category-form select:disabled {
+    background-color: #F0F0F0;
+    color: #666;
+  }
+  
+  .file-upload {
+    margin-bottom: 1rem;
+  }
+  
+  .upload-area {
+    width: 90%;
+    border: 2px dashed #11203A;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #ffffff;
+  }
+  
+  .upload-icon {
+    display: inline-block;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #11203A;
+  }
+  
+  .upload-area p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  
+  .browse-btn {
+    background-color: #F8510B;
+    color: #FFF;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+    display: inline-block;
+    width: 20%;
+    margin: 0 auto;
+  }
+  
+  .browse-btn:hover {
+    transform: scale(1.05);
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .form-actions button {
+    background-color: #F8510B;
+    color: #FFF;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .form-actions button:first-child {
+    background-color: transparent;
+    color: #F8510B;
+    border: 1px solid #F8510B;
+  }
+  
+  .form-actions button:hover {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    .add-category-form {
+        margin-left: 20px;
+        margin-right: 20px;
+        padding: 1rem;
+    }
+
+    .add-category-form h3, .add-category-form h4 {
+        font-size: 1.3rem;
+    }
+
+    .add-category-form input, 
+    .add-category-form select,
+    .add-category-form textarea {
+        width: 95%;
+        font-size: 0.9rem;
+    }
+
+    .upload-area {
+        width: 90%;
+        padding: 1rem;
+    }
+
+    .browse-btn {
+        width: 50%;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-actions button {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+    
+  }
+
+  @media (max-width: 480px) {
+    .add-category-form {
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 0.9rem;
+    }
+
+    .add-category-form h3, .add-category-form h4 {
+        font-size: 1.1rem;
+    }
+
+    .add-category-form input, 
+    .add-category-form select,
+    .add-category-form textarea {
+        font-size: 0.8rem;
+    }
+
+    .upload-area {
+        padding: 0.8rem;
+    }
+
+    .browse-btn {
+        width: 50%;
+        font-size: 0.8rem;
+    }
+
+    .form-actions button {
+        font-size: 0.8rem;
+    }    
+  }
+  
+  .categories-table {
+    background-color: #FFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    .categories-table {
+        margin-left: 3rem;
+        margin-right: 3rem;
+    }    
+  }
+
+  @media (max-width: 480px) {
+    .categories-table {
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+    }    
+  }
+   
+  .table-header, .category-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    padding: 1rem;
+    border-bottom: 1px solid #E0E0E0;
+  }
+  
+  .table-header {
+    background-color: #1A2A4F;
+    color: #FFF;
+    font-weight: bold;
+  }
+  
+  .category-row .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .category-row .actions button {
+    background-color: #F8510B;
+    color: #FFF;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .category-row .actions button:hover {
+    transform: scale(1.05);
+  }
+  
+  .skeleton-category-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr 1fr;
+    padding: 1rem;
+    border-bottom: 1px solid #E0E0E0;
+    background: linear-gradient(135deg, #E0E0E0 0%, #F0F0F0 100%);
+  }
+  
+  .skeleton {
+    background: linear-gradient(90deg, #D0D0D0 25%, #E0E0E0 50%, #D0D0D0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+  }
+  
+  .skeleton-name, .skeleton-description, .skeleton-posts {
+    width: 80%;
+    height: 15px;
+  }
+  
+  .skeleton-actions {
+    width: 60%;
+    height: 30px;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  @media (max-width: 768px) {
+    .table-header, .category-row {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      font-size: 0.9rem;
+    }
+  
+  }
