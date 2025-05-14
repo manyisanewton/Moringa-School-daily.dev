@@ -216,7 +216,8 @@ We welcome contributions to make our  Moringa School daily.dev better! To contri
 
 -Submit a pull request with a detailed explanation of your changes.
 
-📝 License
+## 📝 License
+
 This project is licensed under the MIT License 
 
 ## Authors
