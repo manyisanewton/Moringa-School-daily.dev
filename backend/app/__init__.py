@@ -2,6 +2,7 @@ import warnings
 from sqlalchemy.exc import LegacyAPIWarning
 from authlib.integrations.flask_client import OAuth
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
@@ -27,6 +28,11 @@ def create_app(config_name=DevConfig):
         }
     else:
         app.config.from_object(config_name)
+    CORS(
+        app,
+        supports_credentials=True,
+        origins=["http://localhost:5173"]
+    )
     db.init_app(app)
     app.extensions["sqlalchemy"].db = db
     migrate.init_app(app, db)
