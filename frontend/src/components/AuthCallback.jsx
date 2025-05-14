@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getUserProfile } from '../api';
 
 function AuthCallback() {
   const navigate = useNavigate();
@@ -7,25 +8,33 @@ function AuthCallback() {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
+    const access_token = params.get('access_token');
+    const refresh_token = params.get('refresh_token');
+    const role = params.get('role');
+    const redirect_url = params.get('redirect_url');
     const error = params.get('error');
 
     if (error) {
-      navigate('/login', { state: { error: error || 'OAuth login failed' } });
+      navigate('/login', { state: { error } });
       return;
     }
 
-    if (accessToken && refreshToken) {
-      localStorage.setItem('access_token', accessToken);
-      localStorage.setItem('refresh_token', refreshToken);
-      navigate('/home');
+    if (access_token && refresh_token && role && redirect_url) {
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      localStorage.setItem('user_role', role);
+      getUserProfile().then((profileResponse) => {
+        localStorage.setItem('user_id', profileResponse.data.id);
+        navigate(redirect_url);
+      }).catch(() => {
+        navigate('/login', { state: { error: 'Failed to fetch user profile' } });
+      });
     } else {
-      navigate('/login', { state: { error: 'OAuth login failed: No tokens received' } });
+      navigate('/login', { state: { error: 'Authentication failed' } });
     }
   }, [navigate, location]);
 
-  return <div>Processing authentication...</div>;
+  return <div>Loading...</div>;
 }
 
 export default AuthCallback;

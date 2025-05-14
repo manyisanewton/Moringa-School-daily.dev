@@ -35,6 +35,7 @@ api.interceptors.response.use(
           withCredentials: true,
         });
         localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user_role', data.role);
         originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
         return api(originalRequest);
       } catch (refreshError) {
@@ -44,6 +45,19 @@ api.interceptors.response.use(
         window.location.href = '/login';
         return Promise.reject(refreshError);
       }
+    } else if (error.response?.status === 429) {
+      // Retry after a delay for rate limit errors
+      if (!originalRequest._retryCount) {
+        originalRequest._retryCount = 0;
+      }
+      if (originalRequest._retryCount < 3) {
+        originalRequest._retryCount += 1;
+        const delay = Math.pow(2, originalRequest._retryCount) * 1000; // Exponential backoff
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return api(originalRequest);
+      }
+      console.error('Rate limit exceeded after retries:', error.response?.data);
+      throw error;
     } else if (error.response?.status === 409) {
       if (error.response.data.suggestion === 'login') {
         window.location.href = '/login';
@@ -54,38 +68,73 @@ api.interceptors.response.use(
 );
 
 export const login = async (email, password) => {
-  const response = await api.post('/auth/login', { email, password });
-  return response;
+  try {
+    const response = await api.post('/auth/login', { email, password });
+    return response;
+  } catch (error) {
+    console.error('Login error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const register = async (name, email, phone, role, password) => {
-  const response = await api.post('/auth/register', { name, email, phone, role, password });
-  return response;
+  try {
+    const response = await api.post('/auth/register', { name, email, phone, role, password });
+    return response;
+  } catch (error) {
+    console.error('Registration error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const getUserProfile = async () => {
-  const response = await api.get('/auth/me');
-  return response;
+  try {
+    const response = await api.get('/auth/me');
+    return response;
+  } catch (error) {
+    console.error('Get user profile error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const requestPasswordReset = async (email) => {
-  const response = await api.post('/auth/request-password-reset', { identifier: email });
-  return response;
+  try {
+    const response = await api.post('/auth/request-password-reset', { identifier: email });
+    return response;
+  } catch (error) {
+    console.error('Request password reset error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const verifyResetCode = async (email, code) => {
-  const response = await api.post('/auth/verify-reset-code', { email, code });
-  return response;
+  try {
+    const response = await api.post('/auth/verify-reset-code', { email, code });
+    return response;
+  } catch (error) {
+    console.error('Verify reset code error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const resetPassword = async (code, new_password, confirm_password) => {
-  const response = await api.post('/auth/reset-password', { code, new_password, confirm_password });
-  return response;
+  try {
+    const response = await api.post('/auth/reset-password', { code, new_password, confirm_password });
+    return response;
+  } catch (error) {
+    console.error('Reset password error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const getNotifications = async () => {
-  const response = await api.get('/notifications');
-  return response;
+  try {
+    const response = await api.get('/notifications');
+    return response;
+  } catch (error) {
+    console.error('Get notifications error:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const getContent = async (page = 1, perPage = 10) => {
@@ -102,7 +151,7 @@ export const getUserContent = async (page = 1, perPage = 10) => {
   try {
     const userId = localStorage.getItem('user_id');
     if (!userId) throw new Error('User ID not found in localStorage');
-    const response = await api.get(`/content?user_id=${userId}&page=${page}&per_page=${perPage}`);
+    const response = await api.get(`/content?user_id=${userId}&per_page=${perPage}`);
     return response.data.items;
   } catch (error) {
     console.error('Error fetching user content:', error.response?.data || error.message);

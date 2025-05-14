@@ -3,6 +3,7 @@
     flex-direction: column;
     height: 100vh;
     font-family: 'Times New Roman', Times, serif;
+    height:auto;
 }
 
 @media (min-width: 768px) {
@@ -24,7 +25,7 @@
 }
 
 .left-panel h1 {
-    font-size: 2rem;
+    font-size: 3rem;
     margin-bottom: 20px;
     font-weight: bold;
     line-height: 1.4;
@@ -78,12 +79,14 @@
     justify-content: center;
     align-items: center;
     padding: 20px;
+    width: 100%;
+
 }
 
 .form-card {
     background-color: #ffffff;
     padding: 20px;
-    border-radius: 16px;
+    border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
@@ -104,12 +107,13 @@
 }
 
 .form-card input, .form-card select {
-    width: 95%;
+    width: 100%;
     padding: 10px;
     margin-bottom: 15px;
     border: 1.5px solid #11203A;
-    border-radius: 6px;
-    background-color: #ffffff;
+    border-radius: 20px;
+    background-color:white;
+    border-color: orangered;
 }
 
 .password-wrapper {
@@ -130,7 +134,7 @@
     color: white;
     padding: 10px;
     border: none;
-    border-radius: 8px;
+    border-radius: 15px;
     font-weight: bold;
     font-size: 1rem;
     margin-top: 10px;
@@ -171,6 +175,7 @@
     margin-right: 10px;
     justify-content: center;
     gap: 12px;
+    
 }
 
 .social-btn .icon:hover {

@@ -91,7 +91,7 @@
     color: #FFF;
     border: none;
     padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    border-radius: 20px;
     cursor: pointer;
     display: inline-block;
     font-weight: 500;
@@ -139,3 +139,13 @@
       font-size: 0.9rem;
     }
   }
+  .btn-profile {
+    background-color: #11203A;
+    color: #FFF;
+    border: 1px solid #11203A;
+    padding: 0.8rem 1.3rem;
+    border-radius: 20px; /* Rounded corners */
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}

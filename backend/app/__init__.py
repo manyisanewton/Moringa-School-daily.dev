@@ -1,23 +1,12 @@
 import logging
-import warnings
 import os
-from sqlalchemy.exc import LegacyAPIWarning
-from authlib.integrations.flask_client import OAuth
-from flask import Flask, jsonify, send_from_directory
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, jsonify, send_from_directory, Blueprint, request
 from flask_cors import CORS
-from flask_session import Session
-from flask_mail import Mail
 from twilio.rest import Client as TwilioClient
-from flask_socketio import SocketIO
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from .extensions import db, migrate, bcrypt, jwt, oauth, mail, socketio, limiter, session
+from .models import Role, UserRoleEnum
 from config import DevConfig, TestConfig
 import requests
-from flask import Blueprint, jsonify, request
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -26,20 +15,6 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-
-# Suppress LegacyAPIWarning
-warnings.filterwarnings("ignore", category=LegacyAPIWarning)
-Flask._check_setup_finished = lambda self, f_name: None
-
-# Initialize Flask extensions
-db = SQLAlchemy(session_options={"expire_on_commit": False})
-migrate = Migrate()
-bcrypt = Bcrypt()
-jwt = JWTManager()
-oauth = OAuth()
-mail = Mail()
-socketio = SocketIO(cors_allowed_origins="*")
-limiter = Limiter(key_func=get_remote_address)  # Initialize limiter
 
 # Proxy Blueprint
 proxy_bp = Blueprint("proxy", __name__, url_prefix="/proxy")
@@ -153,14 +128,14 @@ def create_app(config_class=DevConfig):
     # Initialize session
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['SESSION_PERMANENT'] = False
-    Session(app)
+    session.init_app(app)
 
     # Enable CORS with correct origin and credentials
     CORS(app, resources={
         r"/*": {
             "origins": [
-                "http://localhost:5173",           # Local development
-                "https://demo-cr4t.onrender.com"   # Production frontend
+                "http://localhost:5173",
+                "https://demo-cr4t.onrender.com"
             ],
             "supports_credentials": True,
             "allow_headers": ["Content-Type", "Authorization"],
@@ -185,7 +160,11 @@ def create_app(config_class=DevConfig):
     oauth.init_app(app)
     mail.init_app(app)
     socketio.init_app(app)
-    limiter.init_app(app)  # Initialize limiter with app
+    try:
+        limiter.init_app(app)
+    except Exception as e:
+        logger.warning(f"Failed to connect to Redis, falling back to in-memory storage: {str(e)}")
+        limiter._storage_uri = "memory://"
 
     # Initialize Twilio client
     sid = app.config.get("TWILIO_ACCOUNT_SID")
@@ -216,7 +195,7 @@ def create_app(config_class=DevConfig):
         api_base_url="https://www.googleapis.com/oauth2/v1/",
         client_kwargs={"scope": "openid email profile"},
     )
-    print("Google OAuth registered successfully")
+    logger.info("Google OAuth registered successfully")
 
     # Error handler for 404
     @app.errorhandler(404)

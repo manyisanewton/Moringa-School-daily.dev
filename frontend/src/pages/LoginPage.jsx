@@ -1,7 +1,7 @@
 import './LoginPage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { login, getUserProfile } from '../api';
 
@@ -12,12 +12,23 @@ function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
+
     if (location.state?.error) {
       setError(location.state.error);
     }
-  }, [location]);
+
+    const token = localStorage.getItem('access_token');
+    const role = localStorage.getItem('user_role');
+    const targetPath = role ? `/${role.toLowerCase()}dashboard` : '/login';
+    if (token && role && location.pathname !== targetPath) {
+      navigate(targetPath, { replace: true });
+    }
+  }, []); // Run once on mount
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,27 +38,27 @@ function LoginPage() {
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
       localStorage.setItem('user_role', data.role);
-      const profileResponse = await getUserProfile();
-      localStorage.setItem('user_id', profileResponse.data.id);
-      switch (data.role) {
-        case 'Admin':
-          navigate('/adminsdashboard');
-          break;
-        case 'TechWriter':
-          navigate('/techwriterdashboard');
-          break;
-        case 'User':
-          navigate('/usersdashboard');
-          break;
-        default:
-          setError('Unknown role');
+      try {
+        const profileResponse = await getUserProfile();
+        localStorage.setItem('user_id', profileResponse.data.id);
+      } catch (profileError) {
+        console.warn('Failed to fetch user profile, proceeding with login:', profileError.response?.data || profileError.message);
       }
+      const targetPath = data.redirect_url || `/${data.role.toLowerCase()}dashboard`;
+      navigate(targetPath, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      const errorMessage = err.response?.status === 401
+        ? 'Invalid email or password'
+        : err.response?.status === 429
+        ? 'Too many requests, please try again later'
+        : err.response?.data?.error || 'Login failed';
+      setError(errorMessage);
+      console.error('Login error:', err.response?.data || err.message);
     }
   };
+
   const handleRegisterRedirect = () => {
-    navigate('/register');
+    navigate('/register', { replace: true });
   };
 
   const handleOAuthLogin = (provider) => {

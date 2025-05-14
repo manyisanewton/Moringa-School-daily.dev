@@ -1,10 +1,10 @@
 import logging
 from functools import wraps
-from flask import jsonify, current_app
+from flask import jsonify, current_app, abort
 from flask_jwt_extended import get_jwt_identity
 from flask_mail import Message
-from . import db, mail
-from .models import UserRole, Role
+from .extensions import db, mail
+from .models import User, UserRole, Role
 
 logger = logging.getLogger(__name__)
 
@@ -18,20 +18,20 @@ def roles_required(*required_roles):
         def wrapper(*args, **kwargs):
             try:
                 user_id = int(get_jwt_identity())
-                rows = (
-                    db.session
-                    .query(Role.name)
-                    .join(UserRole, Role.id == UserRole.role_id)
-                    .filter(UserRole.user_id == user_id)
-                    .all()
-                )
-                user_roles = {name for (name,) in rows}
-                if not user_roles.intersection(required_roles):
-                    return jsonify(error="Forbidden: insufficient role"), 403
-            except Exception:
-                logger.exception("Error verifying roles for user_id=%s", user_id)
-                return jsonify(error="Unable to verify roles"), 500
-            return fn(*args, **kwargs)
+                user = db.session.get(User, user_id)
+                if not user:
+                    abort(404, description="User not found")
+                user_role_names = [role.name for role in user.roles]
+                if not any(role_name in user_role_names for role_name in required_roles):
+                    current_app.logger.warning(
+                        "Access denied: user %s with roles %s tried to access route requiring %s",
+                        user_id, user_role_names, required_roles
+                    )
+                    return jsonify({"error": f"Forbidden: Requires one of {', '.join(required_roles)} roles"}), 403
+                return fn(*args, **kwargs)
+            except Exception as e:
+                logger.exception("Error verifying roles for user_id=%s: %s", user_id, str(e))
+                return jsonify({"error": "Unable to verify roles"}), 500
         return wrapper
     return decorator
 
@@ -41,5 +41,5 @@ def send_email(to, subject, html_body):
         msg.sender = current_app.config.get("MAIL_DEFAULT_SENDER", "noreply@example.com")
         mail.send(msg)
     except Exception as e:
-        logger.exception("Failed to send email to %s", to)
+        logger.exception("Failed to send email to %s: %s", to, str(e))
         raise

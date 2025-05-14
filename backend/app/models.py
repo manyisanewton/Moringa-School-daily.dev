@@ -65,6 +65,7 @@ class User(db.Model):
     notifications = db.relationship("Notification", back_populates="user", cascade="all, delete-orphan")
     comments = db.relationship("Comment", back_populates="user", cascade="all, delete-orphan")
     likes = db.relationship("Like", back_populates="user", cascade="all, delete-orphan")
+    password_reset_tokens = db.relationship("PasswordResetToken", back_populates="user", cascade="all, delete-orphan")
 
     def get_primary_role(self):
         return self.roles[0].name if self.roles else 'User'
@@ -113,7 +114,7 @@ class Permission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True, nullable=False)
     description = db.Column(db.String(256))
-    role_permissions = db.relationship("RolePermission", backref="permission", cascade="all, delete-orphan")
+    role_permissions = db.relationship("RolePermission", back_populates="permission", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Permission id={self.id} name={self.name}>"
@@ -137,6 +138,7 @@ class RolePermission(db.Model):
     permission_id = db.Column(db.Integer, db.ForeignKey("permissions.id", ondelete="CASCADE"), nullable=False)
     __table_args__ = (db.UniqueConstraint("role_id", "permission_id", name="uq_role_permission"),)
     role = db.relationship("Role", back_populates="role_permissions")
+    permission = db.relationship("Permission", back_populates="role_permissions")
 
     def __repr__(self):
         return f"<RolePermission role_id={self.role_id} permission_id={self.permission_id}>"
@@ -169,7 +171,7 @@ def seed_categories(target, connection, **kw):
             {"name": "Artificial Intelligence", "description": "Content related to AI and machine learning."}
         ]
         for cat in hardcoded_categories:
-            connection.execute(target.insert().values(name=cat["name"], description=cat["description"], created_by=1))
+            connection.execute(target.insert().values(name=cat["name"], description=cat["description"], created_by=None))
 
 class Tag(db.Model):
     __tablename__ = "tags"
@@ -378,7 +380,7 @@ class PasswordResetToken(db.Model):
     expires_at = db.Column(db.DateTime, nullable=False)
     used = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=func.now(), nullable=False)
-    user = db.relationship("User", backref="password_reset_tokens")
+    user = db.relationship("User", back_populates="password_reset_tokens")
 
     def __repr__(self):
         return f"<PasswordResetToken id={self.id} user_id={self.user_id}>"

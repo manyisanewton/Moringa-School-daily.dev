@@ -35,34 +35,26 @@ function RegisterPage() {
       localStorage.setItem('user_role', data.role);
       const profileResponse = await getUserProfile();
       localStorage.setItem('user_id', profileResponse.data.id);
-      switch (data.role) {
-        case 'Admin':
-          navigate('/adminsdashboard');
-          break;
-        case 'TechWriter':
-          navigate('/techwriterdashboard');
-          break;
-        case 'User':
-          navigate('/usersdashboard');
-          break;
-        default:
-          setError('Unknown role');
-      }
+      navigate(data.redirect_url || `/${data.role.toLowerCase()}dashboard`);
     } catch (err) {
       const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Registration failed';
       if (err.response?.status === 409 && err.response?.data?.suggestion === 'login') {
-        setError('Email already registered. Please log in or use a different email.');
+        setError('Email already registered. Redirecting to login...');
         setTimeout(() => navigate('/login'), 3000);
       } else {
         setError(errorMessage);
       }
     }
   };
+
   const redirectToLogin = () => {
     navigate('/login');
   };
 
   const handleOAuthLogin = (provider) => {
+    if (role) {
+      sessionStorage.setItem('pending_role', role);
+    }
     window.location.href = `http://localhost:5000/auth/login/${provider}`;
   };
 
@@ -76,7 +68,7 @@ function RegisterPage() {
       <div className='right-panel'>
         <div className='form-card'>
           <h2>Register</h2>
-          {error && <p className='error'>{error.toString()}</p>}
+          {error && <p className='error'>{error}</p>}
           <form onSubmit={handleSubmit}>
             <label>Full Name:</label>
             <input
@@ -126,7 +118,7 @@ function RegisterPage() {
             <label>Confirm Password:</label>
             <div className='password-wrapper'>
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showConfirmPassword ? 'text' : 'password'}
                 placeholder='Confirm Password'
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

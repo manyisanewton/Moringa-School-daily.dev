@@ -13,9 +13,9 @@ from flask_jwt_extended.utils import decode_token
 from authlib.integrations.flask_client import OAuthError
 from marshmallow import Schema, fields, validate, ValidationError
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from . import db, bcrypt, oauth
+from .extensions import db, bcrypt, oauth, limiter  # Added limiter import
 from .models import User, RefreshToken, PasswordResetToken, Role, UserRole
-from .utils import roles_required
+from .permissions import requires_role
 
 logger = logging.getLogger(__name__)
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -91,7 +91,6 @@ def register():
         logger.exception("Registration failed")
         return jsonify({"error": "Registration failed."}), 500
 
-    # Assign role (required in schema, so always provided)
     role_name = d["role"]
     role = Role.query.filter_by(name=role_name).first()
     if not role:
@@ -107,12 +106,14 @@ def register():
         return jsonify({"error": "Failed to assign role."}), 500
 
     at, rtok = _create_tokens(u.id)
+    logger.info("User %s registered with role %s", d["email"], role_name)
     return (
         jsonify(
             message="Registration successful.",
             access_token=at,
             refresh_token=rtok,
-            role=role_name  # Include primary role
+            role=role_name,
+            redirect_url=f"/{role_name.lower()}dashboard"
         ),
         201,
     )
@@ -121,16 +122,22 @@ def register():
 def login():
     d = LoginSchema().load(request.get_json() or {})
     u = User.query.filter_by(email=d["email"]).first()
-    if not u or not bcrypt.check_password_hash(u.password_hash, d["password"]):
+    if not u:
+        logger.warning("Login attempt with non-existent email: %s", d["email"])
+        return jsonify({"error": "Invalid credentials."}), 401
+    if not bcrypt.check_password_hash(u.password_hash, d["password"]):
+        logger.warning("Invalid password for email: %s", d["email"])
         return jsonify({"error": "Invalid credentials."}), 401
     at, rtok = _create_tokens(u.id)
-    primary_role = u.get_primary_role()  # Use User model's get_primary_role()
+    primary_role = u.get_primary_role()
+    logger.info("User %s logged in with role %s", d["email"], primary_role)
     return (
         jsonify(
             message=f"Welcome back, {u.name or u.email}.",
             access_token=at,
             refresh_token=rtok,
-            role=primary_role  # Include primary role
+            role=primary_role,
+            redirect_url=f"/{primary_role.lower()}dashboard"
         ),
         200,
     )
@@ -141,13 +148,21 @@ def refresh():
     jti = get_jwt()["jti"]
     rt = RefreshToken.query.filter_by(token=jti).first()
     if not rt or rt.revoked:
+        logger.warning("Invalid refresh token attempt: %s", jti)
         return jsonify({"error": "Invalid refresh token."}), 401
     uid = int(get_jwt_identity())
     at = create_access_token(
         identity=str(uid),
         expires_delta=current_app.config["JWT_ACCESS_TOKEN_EXPIRES"],
     )
-    return jsonify(access_token=at), 200
+    u = db.session.get(User, uid)
+    primary_role = u.get_primary_role()
+    logger.info("Token refreshed for user %s", uid)
+    return jsonify(
+        access_token=at,
+        role=primary_role,
+        redirect_url=f"/{primary_role.lower()}dashboard"
+    ), 200
 
 @auth_bp.route("/logout", methods=["DELETE"])
 @jwt_required(refresh=True)
@@ -157,17 +172,21 @@ def logout():
     if rt:
         rt.revoked = True
         db.session.commit()
+        logger.info("User logged out, refresh token %s revoked", jti)
     return jsonify(message="Refresh token revoked."), 200
 
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
+@limiter.exempt  # Exempt /auth/me from rate limiting
 def me():
     uid = int(get_jwt_identity())
     u = db.session.get(User, uid)
     if not u:
+        logger.warning("User not found for ID: %s", uid)
         return jsonify({"error": "User not found."}), 404
     roles = [{"id": ur.role_id, "name": ur.role.name} for ur in u.user_roles]
-    primary_role = u.get_primary_role()  # Use User model's get_primary_role()
+    primary_role = u.get_primary_role()
+    logger.info("Profile fetched for user %s", uid)
     return (
         jsonify(
             id=u.id,
@@ -176,68 +195,11 @@ def me():
             is_active=u.is_active,
             created_at=u.created_at.isoformat(),
             roles=roles,
-            primary_role=primary_role  # Include primary role
+            primary_role=primary_role,
+            redirect_url=f"/{primary_role.lower()}dashboard"
         ),
         200,
     )
-
-# Commented out to avoid conflict with password_reset.py endpoint
-# @auth_bp.route("/request-password-reset", methods=["POST"])
-# def request_password_reset():
-#     db.session.expire_all()
-#     try:
-#         incoming_data = request.get_json()
-#         logger.info("Incoming request for password reset: %s", incoming_data)
-#         d = RequestPasswordResetSchema().load(incoming_data)
-#     except ValidationError as ve:
-#         logger.warning("Validation error during password reset request: %s", ve.messages)
-#         return jsonify({"error": ve.messages}), 400
-#     except Exception as e:
-#         logger.exception("Unexpected error parsing JSON input")
-#         return jsonify({"error": "Invalid input format."}), 400
-#     u = User.query.filter_by(email=d["email"]).first()
-#     # Always return generic message to prevent email enumeration
-#     if not u or not u.is_active:
-#         return jsonify(
-#             message="If that email exists, you will receive reset instructions."
-#         ), 200
-#     t = str(uuid.uuid4())
-#     e = datetime.utcnow() + timedelta(hours=1)
-#     prt = PasswordResetToken(user_id=u.id, token=t, expires_at=e)
-#     db.session.add(prt)
-#     try:
-#         db.session.commit()
-#     except SQLAlchemyError:
-#         db.session.rollback()
-#         logger.exception("Could not create password reset token for user %s", u.id)
-#         return jsonify({"error": "Could not initiate password reset."}), 500
-#     # Here you would normally email the token
-#     return jsonify(message="Password reset token created.", token=t), 200
-
-# Commented out to avoid conflict with password_reset.py endpoint
-# @auth_bp.route("/reset-password", methods=["POST"])
-# def reset_password():
-#     db.session.expire_all()
-#     d = ResetPasswordSchema().load(request.get_json() or {})
-#     prt = PasswordResetToken.query.filter_by(
-#         token=d["token"], used=False
-#     ).first()
-#     if not prt or prt.expires_at < datetime.utcnow():
-#         return jsonify({"error": "Invalid or expired token."}), 400
-#     u = db.session.get(User, prt.user_id)
-#     if not u or not u.is_active:
-#         return jsonify({"error": "Invalid token."}), 400
-#     u.password_hash = bcrypt.generate_password_hash(
-#         d["new_password"]
-#     ).decode()
-#     prt.used = True
-#     try:
-#         db.session.commit()
-#     except SQLAlchemyError:
-#         db.session.rollback()
-#         logger.exception("Failed to reset password for user %s", u.id)
-#         return jsonify({"error": "Could not reset password."}), 500
-#     return jsonify(message="Password has been reset."), 200
 
 @auth_bp.route("/login/google")
 def login_google():
@@ -265,20 +227,24 @@ def callback_google():
     if not em:
         return redirect("http://localhost:5173/auth/callback?error=Google did not return an email")
     u = User.query.filter_by(email=em).first()
+    pending_role = session.get('pending_role', 'User')
     if not u:
         rp = uuid.uuid4().hex
         ph = bcrypt.generate_password_hash(rp).decode()
         u = User(email=em, name=ui.get("name", ""), password_hash=ph)
         db.session.add(u)
         db.session.commit()
-        # Assign default User role
-        role = Role.query.filter_by(name="User").first()
+        role = Role.query.filter_by(name=pending_role).first()
+        if not role:
+            role = Role.query.filter_by(name="User").first()
         if role:
             db.session.add(UserRole(user_id=u.id, role_id=role.id))
             db.session.commit()
     at, rtok = _create_tokens(u.id)
     primary_role = u.get_primary_role()
-    return redirect(f"http://localhost:5173/auth/callback?access_token={at}&refresh_token={rtok}&role={primary_role}")
+    session.pop('pending_role', None)
+    logger.info("Google OAuth login for %s with role %s", em, primary_role)
+    return redirect(f"http://localhost:5173/auth/callback?access_token={at}&refresh_token={rtok}&role={primary_role}&redirect_url=/{primary_role.lower()}dashboard")
 
 @auth_bp.route("/login/github")
 def login_github():
@@ -297,36 +263,44 @@ def callback_github():
         logger.exception("GitHub OAuth failed: %s", str(e))
         return redirect("http://localhost:5173/auth/callback?error=GitHub login failed")
     u = User.query.filter_by(email=em).first()
+    pending_role = session.get('pending_role', 'User')
     if not u:
         rp = uuid.uuid4().hex
         ph = bcrypt.generate_password_hash(rp).decode()
         u = User(email=em, name=pr.get("name", ""), password_hash=ph)
         db.session.add(u)
         db.session.commit()
-        # Assign default User role
-        role = Role.query.filter_by(name="User").first()
+        role = Role.query.filter_by(name=pending_role).first()
+        if not role:
+            role = Role.query.filter_by(name="User").first()
         if role:
             db.session.add(UserRole(user_id=u.id, role_id=role.id))
             db.session.commit()
     at, rtok = _create_tokens(u.id)
     primary_role = u.get_primary_role()
-    return redirect(f"http://localhost:5173/auth/callback?access_token={at}&refresh_token={rtok}&role={primary_role}")
+    session.pop('pending_role', None)
+    logger.info("GitHub OAuth login for %s with role %s", em, primary_role)
+    return redirect(f"http://localhost:5173/auth/callback?access_token={at}&refresh_token={rtok}&role={primary_role}&redirect_url=/{primary_role.lower()}dashboard")
 
 @auth_bp.route("/promote/<int:user_id>/<role_name>", methods=["POST"])
 @jwt_required()
-@roles_required("Admin")
+@requires_role("Admin")
 def promote_user(user_id, role_name):
     u = db.session.get(User, user_id)
     if not u:
+        logger.warning("User not found for promotion: %s", user_id)
         return jsonify({"error": "User not found."}), 404
     r = Role.query.filter_by(name=role_name).first()
     if not r:
+        logger.warning("Role not found: %s", role_name)
         return jsonify({"error": "Role not found."}), 404
     if UserRole.query.filter_by(user_id=u.id, role_id=r.id).first():
+        logger.info("User %s already has role %s", user_id, role_name)
         return jsonify({"error": "User already has that role."}), 409
     db.session.add(UserRole(user_id=u.id, role_id=r.id))
     db.session.commit()
     rs = [x.name for x in u.roles]
+    logger.info("User %s promoted to %s", u.email, role_name)
     return (
         jsonify(
             message=f"{u.email} promoted to {role_name}",

@@ -3,18 +3,13 @@ from flask import Blueprint, abort, jsonify, request
 from flask_jwt_extended import jwt_required
 from marshmallow import Schema, ValidationError, fields, validate
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from . import bcrypt, db
-from .models import(
-    Category,
-    Content,
-    ContentStatusEnum,
-    Role,
-    User,
-    UserRole,
-)
+from .extensions import bcrypt, db
+from .models import Category, Content, ContentStatusEnum, Role, User, UserRole
 from .utils import roles_required
+
 logger = logging.getLogger(__name__)
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
+
 class CreateUserSchema(Schema):
     email = fields.Email(
         required=True,
@@ -39,6 +34,7 @@ class CreateUserSchema(Schema):
         load_default=None,
         validate=validate.Length(max=128),
     )
+
 class CreateCategorySchema(Schema):
     name = fields.Str(
         required=True,
@@ -47,14 +43,17 @@ class CreateCategorySchema(Schema):
     description = fields.Str(
         validate=validate.Length(max=256),
     )
+
 class FlagContentSchema(Schema):
     reason = fields.Str(
         required=True,
         validate=validate.Length(max=256),
     )
+
 @admin_bp.errorhandler(ValidationError)
 def handle_validation_error(err: ValidationError):
     return jsonify({"errors": err.messages}), 400
+
 @admin_bp.route("/users", methods=["POST"])
 @jwt_required()
 @roles_required("Admin")
@@ -87,6 +86,7 @@ def create_user():
         logger.exception("Failed to create user")
         return jsonify({"error": "User creation failed."}), 500
     return jsonify({"message": "User created.", "id": user.id}), 201
+
 @admin_bp.route("/users/<int:user_id>/deactivate", methods=["POST"])
 @jwt_required()
 @roles_required("Admin")
@@ -97,6 +97,7 @@ def deactivate_user(user_id: int):
     user.is_active = False
     db.session.commit()
     return jsonify({"message": f"User '{user.email}' deactivated."}), 200
+
 @admin_bp.route("/users/<int:user_id>/promote/<role_name>", methods=["POST"])
 @jwt_required()
 @roles_required("Admin")
@@ -115,6 +116,7 @@ def promote_user(user_id: int, role_name: str):
     db.session.add(UserRole(user_id=user.id, role_id=role.id))
     db.session.commit()
     return jsonify({"message": f"'{user.email}' promoted to '{role_name}'."}), 200
+
 @admin_bp.route("/categories", methods=["POST"])
 @jwt_required()
 @roles_required("Admin", "TechWriter")
@@ -135,6 +137,7 @@ def create_category():
         logger.exception("Failed to create category")
         return jsonify({"error": "Category creation failed."}), 500
     return jsonify({"message": "Category created.", "id": category.id}), 201
+
 @admin_bp.route("/contents/<int:content_id>/approve", methods=["POST"])
 @jwt_required()
 @roles_required("Admin")
@@ -145,6 +148,7 @@ def approve_content(content_id: int):
     content.status = ContentStatusEnum.Published
     db.session.commit()
     return jsonify({"message": f"Content {content.id} approved."}), 200
+
 @admin_bp.route("/contents/<int:content_id>/flag", methods=["POST"])
 @jwt_required()
 @roles_required("Admin")
@@ -159,6 +163,7 @@ def flag_content(content_id: int):
         jsonify({"message": f"Content {content.id} flagged.", "reason": data["reason"]}),
         200,
     )
+
 @admin_bp.route("/contents/<int:content_id>", methods=["DELETE"])
 @jwt_required()
 @roles_required("Admin")

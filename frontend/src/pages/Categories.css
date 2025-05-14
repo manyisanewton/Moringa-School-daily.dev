@@ -67,7 +67,7 @@
   justify-content: center;
   gap: 10px;
   border: 1px solid #11203A;
-  border-radius: 25px;
+  border-radius: 10px;
   padding: 0.5rem 1rem;
   margin: 0 auto;
   background-color: #ffffff;
@@ -84,6 +84,7 @@
   font-size: 1rem;
   color: #11203A;
   background: transparent;
+  
 }
 
 .search-bar input::placeholder {
@@ -447,11 +448,11 @@
 }
 
 .comment-section input {
-  width: 100%;
+  width:90%;
   margin-bottom: 8px;
   padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid orangered;
+  border-radius: 15px;
   font-size: 0.9rem;
   transition: border-color 0.3s ease;
 }

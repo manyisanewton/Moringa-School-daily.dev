@@ -8,7 +8,7 @@ class BaseConfig:
     SECRET_KEY = os.getenv("SECRET_KEY", "devkey")
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "secret-jwt-key")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(
-        minutes=int(os.getenv("JWT_ACCESS_EXPIRES_MINUTES", 15))
+        minutes=int(os.getenv("JWT_ACCESS_EXPIRES_MINUTES", 30))  # Increased to 30 minutes
     )
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(
         days=int(os.getenv("JWT_REFRESH_EXPIRES_DAYS", 30))
@@ -33,13 +33,16 @@ class BaseConfig:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_USERNAME')
-    
+    # Rate limiting configuration
+    RATELIMIT_ENABLED = os.getenv("RATELIMIT_ENABLED", "true").lower() == "true"
     
 class DevConfig(BaseConfig):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL", "postgresql://localhost/daily_dev"
     )
+    RATELIMIT_ENABLED = False  # Disable rate limiting in development
+    
 class TestConfig(BaseConfig):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
@@ -47,5 +50,7 @@ class TestConfig(BaseConfig):
         "poolclass": StaticPool,
         "connect_args": {"check_same_thread": False},
     }
+    RATELIMIT_ENABLED = False
+    
 class ProdConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")

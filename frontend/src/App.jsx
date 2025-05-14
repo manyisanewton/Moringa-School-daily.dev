@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getUserProfile } from './api';
 
 import RegistrationPage from './pages/RegistrationPage';
 import LoginPage from './pages/LoginPage';
@@ -23,36 +25,64 @@ import Code from "./admin/Code";
 import NewPassword from "./admin/NewPassword";
 
 import AdminHome from './admin/AdminHome';
-import CategoriesMangement from './admin/CategoriesManagement';
+import CategoriesManagement from './admin/CategoriesManagement';
 import AdminProfile from './admin/AdminProfile';
 import UserManagement from './admin/UserManagement';
 import ContentManagement from './admin/ContentManagement';
 
 function ProtectedRoute({ children, requiredRole }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [userRole, setUserRole] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const hasCheckedAuth = useRef(false); // Track if auth check has run
 
   useEffect(() => {
-    const role = localStorage.getItem('user_role');
-    if (!role) {
-      navigate('/login', { state: { error: 'Please log in to access this page' } });
-    } else {
-      setUserRole(role);
-    }
-  }, []);
+    if (hasCheckedAuth.current) return; // Prevent multiple runs
+    hasCheckedAuth.current = true;
+
+    const checkAuth = async () => {
+      const role = localStorage.getItem('user_role');
+      if (role) {
+        setUserRole(role);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await getUserProfile();
+        const fetchedRole = response.data.primary_role;
+        localStorage.setItem('user_role', fetchedRole);
+        setUserRole(fetchedRole);
+      } catch (error) {
+        console.error('Auth check failed:', error.response?.data || error.message);
+        if (location.pathname !== '/login') {
+          navigate('/login', { state: { error: 'Please log in to access this page' }, replace: true });
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []); // Empty dependency array to run once on mount
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   if (userRole === null) {
-    return <div>Loading...</div>;
+    return <Navigate to="/login" replace />;
   }
 
   if (userRole !== requiredRole) {
     switch (userRole) {
       case 'Admin':
-        return <Navigate to="/adminsdashboard" replace />;
+        return <Navigate to="/admindashboard" replace />;
       case 'TechWriter':
         return <Navigate to="/techwriterdashboard" replace />;
       case 'User':
-        return <Navigate to="/usersdashboard" replace />;
+        return <Navigate to="/userdashboard" replace />;
       default:
         return <Navigate to="/login" replace />;
     }
@@ -77,11 +107,17 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/home" element={<Home2 />} />
         <Route path="/code" element={<Code />} />
-        {/* <Route path="/new-password" element={<NewPassword />} /> */}
         <Route path="/notificationss" element={<Notificationss />} />
-
         <Route
-          path="/usersdashboard"
+          path="/new-password"
+          element={
+            <ErrorBoundary>
+              <NewPassword />
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/userdashboard"
           element={
             <ProtectedRoute requiredRole="User">
               <Home2 />
@@ -97,18 +133,10 @@ function App() {
           }
         />
         <Route
-                    path="/new-password"
-                    element={
-                        <ErrorBoundary>
-                            <NewPassword />
-                        </ErrorBoundary>
-                    }
-                />
-        <Route
-          path="/adminsdashboard"
+          path="/admindashboard"
           element={
             <ProtectedRoute requiredRole="Admin">
-              <admin-home />
+              <AdminHome />
             </ProtectedRoute>
           }
         />
@@ -119,12 +147,9 @@ function App() {
         <Route path="/tech-writer-profile" element={<TechWriterProfile />} />
         <Route path="/admin-home" element={<AdminHome />} />
         <Route path="/user-management" element={<UserManagement />} />
-
-        <Route path="/categories-management" element={<CategoriesMangement />} />
+        <Route path="/categories-management" element={<CategoriesManagement />} />
         <Route path="/admin-profile" element={<AdminProfile />} />
         <Route path="/content-management" element={<ContentManagement />} />
-
-        {/* Redirect all unknown routes to the landing page */}   
       </Routes>
     </Router>
   );

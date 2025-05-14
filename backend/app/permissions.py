@@ -2,7 +2,7 @@ from functools import wraps
 from flask import current_app, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import and_, exists
-from . import db
+from .extensions import db
 from .models import UserRole, RolePermission, Permission, User
 
 def requires_permission(permission_name: str):

@@ -1111,7 +1111,6 @@ ALTER TABLE ONLY public.wishlists ALTER COLUMN id SET DEFAULT nextval('public.wi
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
-8bdb365234fd
 \.
 
 
