@@ -3,31 +3,31 @@
 ### A Verified Tech Learning & Community Platform
 
 # 📌 Table of Contents
-## .Project Overview
+1.Project Overview
 
-## . MVP Features
+2. MVP Features
 
-## .Admin Features
+3 .Admin Features
 
-# #.Tech Writer Features
+4.Tech Writer Features
 
-## .User Features
+5.User Features
 
-# #.Technical Stack
+6.Technical Stack
 
-## .Installation & Setup
+7.Installation & Setup
 
-## .API Endpoints
+8.API Endpoints
 
-## .Database Schema
+9.Database Schema
 
-## .Testing
+10.Testing
 
-## .Future Roadmap
+11.Future Roadmap
 
-## .Contributing
+12.Contributing
 
-## .License
+13.License
 
 ## 🌐 Project Overview
 Moringa School daily.dev is a platform designed to create an open and accessible community for Moringa School students, alumni, and instructors to share verified tech content. This includes insightful articles, educational videos, and podcasts that cover various aspects of the tech industry.
